@@ -11,6 +11,7 @@ class GroupBuyTools:
             'adjusted_price': 'adjusted_price.txt',
             'final_price': 'final_price.txt',
             'matching_table': 'matching_table.txt',
+            'mix': 'mix.txt',
         }
         self.root_dir = root_dir
         self.product_name = os.path.basename(root_dir)
@@ -54,7 +55,17 @@ class GroupBuyTools:
     def get_matching_table(self):
         pass
 
-    def verify_adjusted_price(self):
+    def gen_final_price(self):
+        file = os.path.join(self.root_dir, self.files['final_price'])
+        with open(file, 'w', encoding='utf-8') as f:
+            for character, final_price in self.final_price.items():
+                f.write(f"{character} {final_price}\n")
+        print(f"最终定价已保存至 {file}")
+
+    def verify(self):
+        self.__verify_adjusted_price()
+
+    def __verify_adjusted_price(self):
         total_price = 0
         for adjusted_price in self.adjusted_price.values():
             total_price += adjusted_price
@@ -62,10 +73,3 @@ class GroupBuyTools:
             print(f"{self.product_name}的调价已配平")
         else:
             print(f"{self.product_name}的调价未配平，当前调价总和为 {total_price}")
-
-    def gen_final_price(self):
-        file = os.path.join(self.root_dir, self.files['final_price'])
-        with open(file, 'w', encoding='utf-8') as f:
-            for character, final_price in self.final_price.items():
-                f.write(f"{character} {final_price}\n")
-        print(f"最终定价已保存至 {file}")
