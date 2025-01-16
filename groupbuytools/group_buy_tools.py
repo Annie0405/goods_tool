@@ -123,15 +123,25 @@ class GroupBuyTools:
         self.__verify_adjusted_price()
 
     def visualize_matching_table(self):
-        data = {"Name": ["Alice", "Bob", "Charlie"], "Age": [24, 27, 22]}
-        df = pd.DataFrame(data)
-        print(df)
-        df.to_excel('output.xlsx', sheet_name='People', index=False)
-
-        # 构建排表的二维数组
-        tdarray = []
+        # 初始化一个空的 pandas 格式字典
+        pd_dict = {"character": []}
+        for count in range(1, self.mix + 1):
+            pd_dict[str(count)] = []
+        # 遍历排表，将排表转成 pandas 格式
         for character, matching_table in self.matching_table.items():
-            pass
+            pd_dict["character"].append(character)    # 添加角色名
+            cn_list = []    # 初始化 cn 列表
+            for cn, num in matching_table.items():
+                cn_list.extend([cn] * num)
+            for i in range(self.mix):
+                if i < len(cn_list):
+                    pd_dict[str(i + 1)].append(cn_list[i])
+                else:
+                    pd_dict[str(i + 1)].append("NULL")
+        # 输出 pandas 列表
+        df = pd.DataFrame(pd_dict)
+        df.to_excel(f"datas/{self.product_name}/{self.product_name}排表.xlsx", sheet_name='排表', index=False)
+        print(f"排表已保存至 datas/{self.product_name}/{self.product_name}排表.xlsx")
 
     def cal_remaining(self):
         # 初始化余量表
