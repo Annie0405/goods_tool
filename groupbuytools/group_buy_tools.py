@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import groupbuytools.utils as utils
 
 
 class GroupBuyTools:
@@ -151,11 +152,23 @@ class GroupBuyTools:
         第一个元素是cn。第二个元素是已肾金额
         返回一个字典，键是cn，值是已肾金额
         """
+        already_pay = {}
+        file = os.path.join(self.root_dir, self.files['already_pay'])
+        with open(file, 'r', encoding='utf-8') as f:
+            for line in f.readlines():
+                line = line.strip()
+                if line:
+                    cn, money = line.split(' ')
+                    money = round(float(money), 2)
+                    already_pay[cn] = money
+        return already_pay
+
     # =====================
     # 以下是提供给外部调用的接口
     # =====================
 
     def gen_final_price(self):
+        print("==========")
         file = os.path.join(self.root_dir, self.files['final_price'])
         with open(file, 'w', encoding='utf-8') as f:
             for character, final_price in self.final_price.items():
@@ -210,11 +223,49 @@ class GroupBuyTools:
         if self.remaining:
             print("警告！存在余量！")
         # 输出肾表
+        pay_table = utils.reorder_dict(self.pay_table)  # 按联系方式排序
         out_path = os.path.join(self.root_dir, "肾表（应肾).txt")
         with open(out_path, 'w', encoding='utf-8') as f:
-            for cn, price in self.pay_table.items():
+            for cn, price in pay_table.items():
                 f.write(f"{cn}: {price}\n")
             print(f"肾表已保存至 {out_path}")
+        # 校验肾表
+        total_price = self.mix * self.average_price * len(self.character)
+        total_price = round(total_price, 2)
+        total_pay_price = 0
+        for price in self.pay_table.values():
+            total_pay_price += price
+        total_pay_price = round(total_pay_price, 2)
+        if total_pay_price != total_price:
+            print(f"{self.product_name}的肾表有误，当前肾表总和为{total_pay_price}，应等于{total_price}")
+        else:
+            print(f"{self.product_name}的肾表无误，当前肾表总和等于{total_price}")
+
+    def refund_and_makeup(self):
+        print("==========")
+        # 计算退补
+        rm_table = {}
+        for cn, price in self.pay_table.items():
+            if cn in self.already_pay:
+                rm_price = price - self.already_pay[cn]
+                if rm_price != 0:
+                    rm_table[cn] = round(rm_price, 2)
+            else:
+                rm_table[cn] = price
+        for cn, price in self.already_pay.items():
+            if cn not in self.pay_table:
+                rm_table[cn] = -price
+        # 输出退补
+        rm_table = utils.reorder_dict(rm_table)     # 按联系方式排序
+        out_path = os.path.join(self.root_dir, "退补.txt")
+        with open(out_path, 'w', encoding='utf-8') as f:
+            for cn, price in rm_table.items():
+                already = self.already_pay[cn] if cn in self.already_pay else 0
+                if price > 0:
+                    f.write(f"{cn}已付{already}元，需补{price}元\n")
+                else:
+                    f.write(f"{cn}已付{already}元，需退{-price}元\n")
+        print(f"退补已保存至 {out_path}")
 
     # =====================
     # 以下是私有方法
