@@ -210,8 +210,12 @@ class GroupBuyTools:
         print("==========")
         # 输出余量（如果有）
         if self.remaining:
+            # 计算总余量
+            total_remaining = sum(self.remaining.values())
+            # 输出余量
             out_path = os.path.join(self.root_dir, "余量.txt")
             with open(out_path, 'w', encoding='utf-8') as f:
+                f.write(f"总余量：{total_remaining}\n")
                 for character, num in self.remaining.items():
                     f.write(f"{character}: {num}\n")
             print(f"余量已保存至 {out_path}")
