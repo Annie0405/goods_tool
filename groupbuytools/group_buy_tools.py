@@ -8,20 +8,28 @@ class GroupBuyTools:
     """
     def __init__(self, root_dir):
         self.files = {
-            'average_price': 'average_price.txt',
-            'adjusted_price': 'adjusted_price.txt',
-            'final_price': 'final_price.txt',
-            'matching_table': 'matching_table.txt',
-            'mix': 'mix.txt',
+            'average_price': 'average_price.txt',   # 均价
+            'adjusted_price': 'adjusted_price.txt',     # 调价
+            'final_price': 'final_price.txt',   # 定价
+            'matching_table': 'matching_table.txt',     # 排表
+            'mix': 'mix.txt',   # 配比
+            'already_pay': 'already_pay.txt',   # 已肾
         }
-        self.root_dir = root_dir
-        self.product_name = os.path.basename(root_dir)
-        self.average_price = self.get_average_price()
-        self.character = self.get_character()
-        self.adjusted_price = self.get_adjusted_price()
-        self.final_price = self.get_final_price()
-        self.matching_table = self.get_matching_table()
-        self.mix = self.get_mix()
+        self.root_dir = root_dir    # 根目录
+        self.product_name = self.get_product_name()     # 谷名
+        self.average_price = self.get_average_price()   # 均价
+        self.character = self.get_character()   # 角色列表
+        self.adjusted_price = self.get_adjusted_price()     # 调价
+        self.final_price = self.get_final_price()   # 定价
+        self.matching_table = self.get_matching_table()     # 排表
+        self.mix = self.get_mix()   # 配比
+        self.remaining = self.get_remaining()   # 余量
+        self.pay_table = self.get_pay_table()     # 肾表（应肾）
+        self.already_pay = self.get_already_pay()   # 肾表（已肾）
+
+    def get_product_name(self):
+        dir_name = self.root_dir.split('datas/')[1]
+        return dir_name
 
     def get_average_price(self):
         """
@@ -108,6 +116,41 @@ class GroupBuyTools:
             mix = int(f.readline().strip())
         return mix
 
+    def get_remaining(self):
+        # 初始化余量表
+        remaining = {}
+        for character in self.character:
+            remaining[character] = self.mix
+        # 计算余量
+        for character, matching_table in self.matching_table.items():
+            for cn, num in matching_table.items():
+                remaining[character] -= num
+        # 删除0余量角色
+        zero = []
+        for character, num in remaining.items():
+            if num == 0:
+                zero.append(character)
+        for character in zero:
+            remaining.pop(character)
+        return remaining
+
+    def get_pay_table(self):
+        pay_table = {}
+        for character, matching_table in self.matching_table.items():
+            price = self.final_price[character]
+            for cn, num in matching_table.items():
+                if cn not in pay_table:
+                    pay_table[cn] = 0
+                pay_table[cn] += price * num
+                pay_table[cn] = round(pay_table[cn], 2)
+        return pay_table
+
+    def get_already_pay(self):
+        """
+        肾表（已肾）文件每行2个元素
+        第一个元素是cn。第二个元素是已肾金额
+        返回一个字典，键是cn，值是已肾金额
+        """
     # =====================
     # 以下是提供给外部调用的接口
     # =====================
@@ -120,9 +163,12 @@ class GroupBuyTools:
         print(f"最终定价已保存至 {file}")
 
     def verify(self):
+        print("==========")
         self.__verify_adjusted_price()
+        self.__verify_matching_table()
 
     def visualize_matching_table(self):
+        print("==========")
         # 初始化一个空的 pandas 格式字典
         pd_dict = {"character": []}
         for count in range(1, self.mix + 1):
@@ -140,29 +186,35 @@ class GroupBuyTools:
                     pd_dict[str(i + 1)].append("NULL")
         # 输出 pandas 列表
         df = pd.DataFrame(pd_dict)
-        df.to_excel(f"datas/{self.product_name}/{self.product_name}排表.xlsx", sheet_name='排表', index=False)
-        print(f"排表已保存至 datas/{self.product_name}/{self.product_name}排表.xlsx")
+        if '/' in self.product_name:
+            excel_name = self.product_name.split('/')[1]
+        else:
+            excel_name = self.product_name
+        df.to_excel(f"datas/{self.product_name}/{excel_name}排表.xlsx", sheet_name='排表', index=False)
+        print(f"排表已保存至 datas/{self.product_name}/{excel_name}排表.xlsx")
 
     def cal_remaining(self):
-        # 初始化余量表
-        remaining = {}
-        for character in self.character:
-            remaining[character] = self.mix
-        # 计算余量
-        for character, matching_table in self.matching_table.items():
-            for cn, num in matching_table.items():
-                remaining[character] -= num
-        # 删除0余量角色
-        zero = []
-        for character, num in remaining.items():
-            if num == 0:
-                zero.append(character)
-        for character in zero:
-            remaining.pop(character)
-        # 输出余量
-        print("余量：")
-        for character, num in remaining.items():
-            print(f"{character}: {num}")
+        print("==========")
+        # 输出余量（如果有）
+        if self.remaining:
+            out_path = os.path.join(self.root_dir, "余量.txt")
+            with open(out_path, 'w', encoding='utf-8') as f:
+                for character, num in self.remaining.items():
+                    f.write(f"{character}: {num}\n")
+            print(f"余量已保存至 {out_path}")
+        else:
+            print("无余量")
+
+    def cal_pay_table(self):
+        print("==========")
+        if self.remaining:
+            print("警告！存在余量！")
+        # 输出肾表
+        out_path = os.path.join(self.root_dir, "肾表（应肾).txt")
+        with open(out_path, 'w', encoding='utf-8') as f:
+            for cn, price in self.pay_table.items():
+                f.write(f"{cn}: {price}\n")
+            print(f"肾表已保存至 {out_path}")
 
     # =====================
     # 以下是私有方法
@@ -176,3 +228,13 @@ class GroupBuyTools:
             print(f"{self.product_name}的调价已配平")
         else:
             print(f"{self.product_name}的调价未配平，当前调价总和为 {total_price}")
+
+    def __verify_matching_table(self):
+        for character, matching_table in self.matching_table.items():
+            total_num = 0
+            for num in matching_table.values():
+                total_num += num
+            if total_num > self.mix:
+                print(f"{self.product_name}的排表有误，角色 {character} 的排量总和为 {total_num}，应小于等于 {self.mix}")
+                return
+        print(f"{self.product_name}的排表无误，所有角色的排量总和都小于等于{self.mix}")
