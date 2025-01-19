@@ -1,7 +1,9 @@
 import os
 import pandas as pd
+from openpyxl.styles import Alignment
 import groupbuytools.utils as utils
 
+NULL = ' '
 
 class GroupBuyTools:
     """
@@ -180,7 +182,7 @@ class GroupBuyTools:
         self.__verify_adjusted_price()
         self.__verify_matching_table()
 
-    def visualize_matching_table(self):
+    def visualize_matching_table(self, width=10):
         print("==========")
         # 初始化一个空的 pandas 格式字典
         pd_dict = {"character": []}
@@ -196,15 +198,23 @@ class GroupBuyTools:
                 if i < len(cn_list):
                     pd_dict[str(i + 1)].append(cn_list[i])
                 else:
-                    pd_dict[str(i + 1)].append("NULL")
+                    pd_dict[str(i + 1)].append(NULL)
         # 输出 pandas 列表
         df = pd.DataFrame(pd_dict)
         if '/' in self.product_name:
             excel_name = self.product_name.split('/')[1]
         else:
             excel_name = self.product_name
-        df.to_excel(f"datas/{self.product_name}/{excel_name}排表.xlsx", sheet_name='排表', index=False)
-        print(f"排表已保存至 datas/{self.product_name}/{excel_name}排表.xlsx")
+        out_path = f"datas/{self.product_name}/{excel_name}排表.xlsx"
+        with pd.ExcelWriter(out_path, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name="排表")
+            worksheet = writer.sheets["排表"]
+            for col in worksheet.columns:
+                column = col[0].column_letter  # 获取列字母
+                worksheet.column_dimensions[column].width = width
+                for cell in col:
+                    cell.alignment = Alignment(horizontal='center', vertical='center')  # 单元格居中
+        print(f"排表已保存至 {out_path}")
 
     def cal_remaining(self):
         print("==========")
