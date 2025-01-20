@@ -11,7 +11,7 @@ from groupbuytools.group_buy_tools import GroupBuyTools
 rijiupld = GroupBuyTools(r"datas/日九系列/日九拍立得")
 rijiupld.verify()
 # rijiupld.gen_final_price()
-rijiupld.visualize_matching_table(10)
+rijiupld.visualize_matching_table(8)
 
 # guancangka = GroupBuyTools(r"datas/馆藏卡")
 # guancangka.verify()

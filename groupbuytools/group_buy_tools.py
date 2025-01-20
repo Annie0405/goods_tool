@@ -182,7 +182,7 @@ class GroupBuyTools:
         self.__verify_adjusted_price()
         self.__verify_matching_table()
 
-    def visualize_matching_table(self, width=10):
+    def visualize_matching_table(self, width=8):
         print("==========")
         # 初始化一个空的 pandas 格式字典
         pd_dict = {"character": []}
