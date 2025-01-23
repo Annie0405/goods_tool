@@ -238,7 +238,7 @@ class GroupBuyTools:
             print("警告！存在余量！")
         # 输出肾表
         pay_table = utils.reorder_dict(self.pay_table)  # 按联系方式排序
-        out_path = os.path.join(self.root_dir, "肾表（应肾).txt")
+        out_path = os.path.join(self.root_dir, "肾表（应肾）.txt")
         with open(out_path, 'w', encoding='utf-8') as f:
             for cn, price in pay_table.items():
                 f.write(f"{cn}: {price}\n")
