@@ -11,12 +11,12 @@ class GroupBuyTools:
     """
     def __init__(self, root_dir):
         self.files = {
-            'average_price': 'average_price.txt',   # 均价
-            'adjusted_price': 'adjusted_price.txt',     # 调价
-            'final_price': 'final_price.txt',   # 定价
-            'matching_table': 'matching_table.txt',     # 排表
-            'mix': 'mix.txt',   # 配比
-            'already_pay': 'already_pay.txt',   # 已肾
+            'average_price': '预设1_均价.txt',   # 均价
+            'adjusted_price': '预设2_调价.txt',     # 调价
+            'final_price': '生成1_定价.txt',   # 定价
+            'matching_table': '预设3_排表.txt',     # 排表
+            'mix': '预设4_配比.txt',   # 配比
+            'already_pay': '预设5_已肾.txt',   # 已肾
         }
         self.root_dir = root_dir    # 根目录
         self.product_name = self.get_product_name()     # 谷名
@@ -79,6 +79,11 @@ class GroupBuyTools:
         for character, adjusted_price in self.adjusted_price.items():
             final_price = round(self.average_price + adjusted_price, 2)
             map_final_price[character] = final_price
+        # 结果输出到文件
+        file = os.path.join(self.root_dir, self.files['final_price'])
+        with open(file, 'w', encoding='utf-8') as f:
+            for character, price in map_final_price.items():
+                f.write(f"{character} {price}\n")
         return map_final_price
 
     def get_matching_table(self):
@@ -168,14 +173,6 @@ class GroupBuyTools:
     # =====================
     # 以下是提供给外部调用的接口
     # =====================
-
-    def gen_final_price(self):
-        print("==========")
-        file = os.path.join(self.root_dir, self.files['final_price'])
-        with open(file, 'w', encoding='utf-8') as f:
-            for character, final_price in self.final_price.items():
-                f.write(f"{character} {final_price}\n")
-        print(f"最终定价已保存至 {file}")
 
     def verify(self):
         print("==========")
