@@ -1,0 +1,1 @@
+Pyinstaller -F -w --name=均价计算器 groupbuytools/calculator.py
