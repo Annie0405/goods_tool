@@ -6,9 +6,5 @@ tripxiaoka = GroupBuyTools(r"datas/trip系列/trip小卡")
 qi_miao = GroupBuyTools(r"datas/奇妙拍立得")
 zhen_cang = GroupBuyTools(r"datas/珍藏小卡第五弹")
 
-rijiupld.verify()
-rijiupld.cal_pay_table()
-
-qi_miao.verify()
-
-zhen_cang.verify()
+tripxiaoka.verify()
+tripxiaoka.visualize_matching_table()
