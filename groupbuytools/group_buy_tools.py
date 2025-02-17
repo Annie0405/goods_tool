@@ -5,6 +5,7 @@ import groupbuytools.utils as utils
 
 NULL = ' '
 
+
 class GroupBuyTools:
     """
     提供所有拼团工具的接口
@@ -73,7 +74,6 @@ class GroupBuyTools:
     def get_final_price(self):
         """
         返回一个列表，键是角色名，值是最终定价
-        :return:
         """
         map_final_price = {}
         for character, adjusted_price in self.adjusted_price.items():
@@ -176,8 +176,8 @@ class GroupBuyTools:
 
     def verify(self):
         print("==========")
-        self.__verify_adjusted_price()
-        self.__verify_matching_table()
+        self._verify_adjusted_price()
+        self._verify_matching_table()
 
     def visualize_matching_table(self, width=8):
         print("==========")
@@ -282,7 +282,7 @@ class GroupBuyTools:
     # 以下是私有方法
     # =====================
 
-    def __verify_adjusted_price(self):
+    def _verify_adjusted_price(self):
         total_price = 0
         for adjusted_price in self.adjusted_price.values():
             total_price += adjusted_price
@@ -291,7 +291,7 @@ class GroupBuyTools:
         else:
             print(f"{self.product_name}的调价未配平，当前调价总和为 {total_price}")
 
-    def __verify_matching_table(self):
+    def _verify_matching_table(self):
         for character, matching_table in self.matching_table.items():
             total_num = 0
             for num in matching_table.values():
