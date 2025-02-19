@@ -10,6 +10,17 @@ NULL = '><'
 class IMTools(GroupBuyTools):
     def __init__(self, root_dir):
         super().__init__(root_dir)
+        self.files = {
+            'average_price': '预设1_均价.txt',   # 均价
+            'adjusted_price': '预设2_调价.txt',     # 调价
+            'final_price': '生成1_定价.txt',   # 定价
+            'matching_table': '预设3_排表.txt',     # 排表
+            'mix': '预设4_配比.txt',   # 配比
+            'already_pay': '预设5_已肾.txt',   # 已肾
+            'international_fee': '预设6_国际.txt',   # 国际
+            'personal_international_fee': '生成2_国际.txt',
+        }
+        self.international_fee = self.get_international_fee()
 
     def get_mix(self):
         """
@@ -43,6 +54,14 @@ class IMTools(GroupBuyTools):
         for character in zero:
             remaining.pop(character)
         return remaining
+
+    def get_international_fee(self):
+        file_path = os.path.join(self.root_dir, self.files['international_fee'])
+        with open(file_path, 'r') as f:
+            fee = f.read()
+        fee = fee.strip()
+        fee = round(float(fee), 2)
+        return fee
 
     def visualize_matching_table(self, width=8):
         print("==========")
@@ -109,6 +128,26 @@ class IMTools(GroupBuyTools):
             print(f"{self.product_name}的肾表有误，当前肾表总和为{total_pay_price}，应等于{total_price}")
         else:
             print(f"{self.product_name}的肾表无误，当前肾表总和等于{total_price}")
+
+    def cal_international_fee(self):
+        fee_dict = {}
+        file_path = os.path.join(self.root_dir, self.files['matching_table'])
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f.readlines():
+                line = line.strip()
+                if line:
+                    elements = line.split(' ')
+                    cn = elements[0]
+                    cnt = 0
+                    for e in elements[1:]:
+                        if e.isdigit():
+                            cnt += int(e)
+                    fee_dict[cn] = round(cnt * self.international_fee, 2)
+        file_path = os.path.join(self.root_dir, self.files['personal_international_fee'])
+        with open (file_path, 'w', encoding='utf-8') as f:
+            for cn, fee in fee_dict.items():
+                f.write(f"{cn}\t{fee}\n")
+            print(f"国际运费已保存至 {file_path}")
 
     def _verify_adjusted_price(self):
         total_price = 0
