@@ -71,7 +71,7 @@ class IMTools(GroupBuyTools):
         else:
             excel_name = self.product_name
         out_path = f"datas/{self.product_name}/{excel_name}排表.xlsx"
-        fill = PatternFill(start_color="FAFAD2", end_color="FAFAD2", fill_type="solid")
+        fill = PatternFill(start_color="F0F8FF", end_color="F0F8FF", fill_type="solid")
         with pd.ExcelWriter(out_path, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name="排表")
             worksheet = writer.sheets["排表"]
