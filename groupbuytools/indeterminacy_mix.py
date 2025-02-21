@@ -27,6 +27,7 @@ class IMTools(GroupBuyTools):
         配比文件有若干行，每行第一个元素是角色名，第二个元素是配比，两个元素之间用空格隔开
         """
         mix = {}
+        total = 0
         file = os.path.join(self.root_dir, self.files['mix'])
         with open(file, 'r', encoding='utf-8') as f:
             for line in f.readlines():
@@ -34,7 +35,9 @@ class IMTools(GroupBuyTools):
                 if line:
                     character, mix_ratio = line.split(' ')
                     mix_ratio = int(mix_ratio)
+                    total += mix_ratio
                     mix[character] = mix_ratio
+        print(f'{self.product_name}的总配比数为: ', total)
         return mix
 
     def get_remaining(self):
