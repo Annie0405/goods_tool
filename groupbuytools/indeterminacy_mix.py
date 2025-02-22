@@ -115,7 +115,7 @@ class IMTools(GroupBuyTools):
         out_path = os.path.join(self.root_dir, "肾表（应肾）.txt")
         with open(out_path, 'w', encoding='utf-8') as f:
             for cn, price in pay_table.items():
-                f.write(f"{cn}: {price}\n")
+                f.write(f"{cn}\t{price}\n")
             print(f"肾表已保存至 {out_path}")
         # 校验肾表
         total_mix = 0
