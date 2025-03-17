@@ -4,8 +4,8 @@ from groupbuytools.indeterminacy_mix import IMTools
 # v5_A = IMTools(r"datas/v5系列/v5花前")
 # v5_A.cal_pay_table()
 
-# v5_B = IMTools(r"datas/v5系列/v5花后")
-# v5_B.cal_pay_table()
+v5_B = IMTools(r"datas/v5系列/v5花后")
+v5_B.cal_pay_table()
 
 # ri_jiu = GroupBuyTools(r"datas/日九系列/日九拍立得")
 # ri_jiu.verify()
@@ -15,6 +15,6 @@ from groupbuytools.indeterminacy_mix import IMTools
 # trip.verify()
 # trip.cal_pay_table()
 
-qi_miao = GroupBuyTools(r"datas/奇妙拍立得")
-qi_miao.verify()
-qi_miao.cal_pay_table()
+# qi_miao = GroupBuyTools(r"datas/奇妙拍立得")
+# qi_miao.verify()
+# qi_miao.cal_pay_table()
