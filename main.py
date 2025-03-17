@@ -11,6 +11,10 @@ from groupbuytools.indeterminacy_mix import IMTools
 # ri_jiu.verify()
 # ri_jiu.cal_pay_table()
 
-trip = GroupBuyTools(r"datas/trip系列/trip小卡")
-trip.verify()
-trip.cal_remaining()
+# trip = GroupBuyTools(r"datas/trip系列/trip小卡")
+# trip.verify()
+# trip.cal_pay_table()
+
+qi_miao = GroupBuyTools(r"datas/奇妙拍立得")
+qi_miao.verify()
+qi_miao.cal_pay_table()
